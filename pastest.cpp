@@ -5,6 +5,9 @@ const int echoPin = 6;
 // defines variables
 long duration;
 int distance;
+// timing vars
+unsigned long starttime;
+unsigned long endtime;
 void setup() {
   pinMode(trigPinA, OUTPUT); // Sets the trigPins as Outputs
   pinMode(trigPinB, OUTPUT);
@@ -12,17 +15,21 @@ void setup() {
   Serial.begin(9600); // Starts the serial communication
 }
 void loop() {
-  //Run SONAR in order, 180 deg phase shift
+  //Run SONAR in order, 45 degs
   runSONAR(false);
-  delayMicroseconds(4287);
+  endtime = micros(); //save end time
+  delayMicroseconds(3945-(endtime-starttime)); //The phase shift for 45 degs, account for delay 
   runSONAR(true);
-  delayMicroseconds(100);
+  delayMicroseconds(50); //Allow the signal to propogate before measurement
   readSONAR();
+  //Delay for good measure
+  delay(500);
 }
-void runSONAR(isRight) {
+void runSONAR(boolean isRight) {
   // Clears the trigPin
   digitalWrite((isRight?trigPinB:trigPinA), LOW);
   delayMicroseconds(2);
+  starttime = micros(); //Save the start time
   // Sets the trigPin on HIGH state for 10 micro seconds
   digitalWrite((isRight?trigPinB:trigPinA), HIGH);
   delayMicroseconds(10);
@@ -37,3 +44,5 @@ void readSONAR() {
   Serial.print("Distance: ");
   Serial.println(distance);
 }
+
+
